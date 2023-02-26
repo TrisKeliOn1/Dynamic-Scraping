@@ -4,9 +4,10 @@ const url ="https://www.mercadolivre.com.br/";
 const searchFor = "macbook";
 
 let c = 1;
+const list = [];
 
 (async () => {
-    const browser = await pup.launch({headless: false});
+    const browser = await pup.launch({headless: false}); // trocar para true tudo roda por baixo dos panos
     const page = await browser.newPage();
     console.log('iniciei!');
 
@@ -25,6 +26,7 @@ let c = 1;
     const links = await page.$$eval('.ui-search-result__image > a', el => el.map(link => link.href));
 
     for(const link of links) {
+        if(c === 10) continue;
         console.log('Página', c);
         await page.goto(link);
         await page.waitForSelector('.ui-pdp-title')
@@ -40,13 +42,16 @@ let c = 1;
 
         const obj = {};
         obj.title = title;
-        obg.price = price;
+        obj.price = price;
         (seller ? obj.seller = seller : '');
-        console.log(obj);
+        obj.link = link;
+        
+        list.push(obj);
         
         c++;
     }
 
+    console.log(list);
 
     await page.waitForTimeout(3000);
     await browser.close();
